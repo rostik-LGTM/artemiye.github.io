@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Биография Человека</title>
+    <style>
+        /* Основные стили страницы */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #edeff2;
+            display: flex;
+            justify-content: center;
+        }
+
+        nav a {
+            color: rgb(10, 9, 12);
+            padding: 15px 20px;
+            text-decoration: none;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .info-box {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            min-width: 200px;
+            z-index: 1;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        nav a:hover .info-box {
+            display: block;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+
+        .main-content {
+            flex: 0 0 70%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            flex: 0 0 25%;
+            background-color: #f8f8f8;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .donate {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #dcdcdc;
+            margin-top: 20px;
+        }
+
+        /* Стиль для фото */
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 300px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background-color: white;
+            display: none;
+            flex-direction: column;
+            max-height: 80%;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+
+        .chat-input button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+        }
+
+        .user-message {
+            text-align: right;
+            color: blue;
+        }
+
+        .bot-message {
+            text-align: left;
+            color: green;
+        }
+        #toggle-chat {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 30px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#toggle-chat:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Обновленный стиль для контейнера чата */
+.chat-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 350px; /* Увеличение ширины чата */
+    max-height: 70%;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    background-color: #ffffff;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Стиль для заголовка чата */
+.chat-header {
+    background-color: #007BFF;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Стиль для области сообщений чата */
+.chat-messages {
+    flex-grow: 1;
+    padding: 15px;
+    overflow-y: auto;
+    max-height: 250px;
+    background-color: #f7f9fc; /* Легкий цвет фона для области сообщений */
+    border-bottom: 1px solid #ddd;
+}
+
+/* Стиль для ввода сообщения */
+.chat-input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+}
+
+/* Улучшение стиля ввода и кнопки отправки */
+.chat-input input {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+    transition: border-color 0.3s;
+}
+
+.chat-input input:focus {
+    border-color: #007BFF;
+}
+
+.chat-input button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.chat-input button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Биография Артемия — великого человека наших времен</h1>
+    </header>
+
+    <nav>
+        <a href="#">Главная
+            <div class="info-box">
+                <p>Описание главной страницы, новости и обновления.</p>
+                <p>Знаменитая формула Пика получила своё название по имени автора — австрийского учёного Артемия Пика, опубликовавшего её на рубеже XIX и XX веков. Формула Пика удивительно красива, и потому является любимой темой популярных публикаций (можно порекомендовать статью Г. Мерзона «Площадь многоугольников и тающий лед» из 9-го номера «Квантика» за 2018 год либо более раннюю статью Н. Васильева «Вокруг формулы Пика» из 12-го номера «Кванта» за 1974 год — в этих статьях приводится и её доказательство).
+                </p>
+            </div>
+        </a>
+        <a href="#">О Артемии сейчас
+            <div class="info-box">
+                <p><b>Статус:</b> Не женат<br><br><b>учеба:</b> СГТУ<br><br>5 детей<br><br>Хорошие познанния в ядерной физике<br><br>Любимый учитель-Ольга Анатольевна(математика)<br><br><b>хобби:</b> гребля, плаванье, математика, качалка<br><br><b>Одежда:</b> Черная футболка(Kelvin kline), рваные джинсы, синие наушники JBL</p>
+            </div>
+        </a>
+        <a href="#">Достижения
+            <div class="info-box">
+                <p><i>Перечень всех достижений и наград:</i><br><br>Медаль «Участнику специальной военной операции»<br><br>Нобелевская премия по физике (1921)<br><br>участник межгалактической войны-Republic–Sith War<br><b>Звание: </b>Лорд ситхов<br><br>Чемпион мира по гребле<br><br>Золотая медаль высшего совета по научным исследованиям<br><br>Победитель конкурса "Человек труда" г.Энгельса<br><br><b>Создатель теоремы Пика</b></p>
+            </div>
+        </a>
+        <a href="#">Контакты
+            <div class="info-box">
+                <p>Способы связи и контактные данные.</p>
+                <p>Пишите в телеграмм <i>@banditwater</i> - спонсор сайта и идея (1 слизкая самса на вокзале)</p>
+                <img src="кот-моргает.gif" alt="Читать далее...">
+            </div>
+        </a>
+        <a href="#">Дополнительно
+            <div class="info-box">
+                <p>Дополнительная информация и ресурсы.</p>
+            </div>
+        </a>
+    </nav>
+
+    <div class="container">
+        <div class="main-content">
+            <img src="5341548292737198878.jpg" alt="Фото Артемия">
+            <p class="right">Лишь сказав "Да блять"- на  уроке математики мы обретаем свободу<br><i><b>-Царенко Артемий</b></i></p>
+            <h2>Основная информация</h2>
+            <p>Во время своего пребывания в маленьком городе Энгельс, Артемий, умнейший человек в этом уголке мира, невзирая на свой необычный запах, завоевал сердца людей своими выдающимися знаниями в математике, физике и философии. Его исследования по устойчивым источникам энергии были не только уникальны, но и актуальны, начиная беседы среди ученых.</p>
+
+            <h3>История о Артемии — Умнейшем и Великом Человеке</h3>
+
+            <p>В маленьком городе Энгельс жил-был необычный человек по имени Артемий. Он был не просто умным, он славился как умнейший человек в этом уголке мира. Его знания по математике, физике и философии поражали всех: местные школьники шептались о нём, обсуждая его гениальные идеи и открытия. Однако у Артемия был один очень странный, а порой и неприятный недостаток — он издавал жуткий запах.</p>
+
+            <h3>Секреты Умницы</h3>
+            <p>Артемий был замкнутым человеком. Он не любил общество, предпочитая проводить время со своими книгами и научными исследованиями. Его комната напоминала лабораторию, в которой царил порядок, но сам Артемий был не слишком аккуратен. Он не придавал значения личной гигиене, за что получал желчную критику от друзей и соседей. Неприятный запах, исходивший от него, быстро стал предметом обсуждения в городе.</p>
+
+            <p>Несмотря на это, Артемий не обращал внимания на сплетни, даже когда его стали называть «вонючим гением». Он погружался в исследования столь сильно, что часами мог сидеть над математическими уравнениями или химическими экспериментами, забывая о времени и о том, чтобы привести себя в порядок.</p>
+
+            <h3>Ум и Непонимание</h3>
+            <p>Одним летом в Энгельсе проходила ярмарка науки, и Артемий был приглашён представить свои работы. Его исследования, касающиеся развития устойчивых источников энергии, привлекли внимание многочисленных ученых и студентов. Однако не только его идеи были в центре внимания. По мере того как он выступал на сцене, люди затыкали носы платками, стараясь не поддаваться ужасному запаху.</p>
+
+            <p>Несмотря на это, его изобретения и теории вызывали бурю аплодисментов и восхищения. Но общий интерес к его знаниям и недостаток обаяния вскоре стали источником противоречий. Люди восхищались его умом, но не могли смириться с его запахом. Местные жители шутливо предлагали Артемию проводить свои эксперименты в компании очистителей воздуха и дезодораторов.</p>
+
+            <h3>Изменения и Признание</h3>
+            <p>Однажды, после очередного выступления, к Артемию подошел молодой ученый и сказал: «Твои идеи могут изменить мир! Но ты должен позаботиться о себе. Твой гений стоит того, чтобы о нём заботились». Эти слова задели Артемия. Он вдруг понял, что его гениальные идеи могут быть забыты из-за его ненадлежащего поведения.</p>
+
+            <p>С этого момента он решил изменить свою жизнь. Артемий начал следить за гигиеной и придавать больше значения своему внешнему виду. Он стал больше общаться с людьми, делясь своими знаниями и открываясь новому опыту. Постепенно его запах стал менее выраженным, хотя полностью избавиться от него не удалось.</p>
+
+            <h3>Влияние на Общество</h3>
+            <p>Какой-то время, делая шаги к социализации, Артемий быстро стал не только умным человеком, но и любимцем жителей Энгельса. Он начал преподавать в местном университете, создавая курсы по физике и математике с учетом своего уникального подхода. Его способность объяснять сложные вещи доступным языком привлекала множество студентов. Так, «вонючий гений» стал символом перемен в городе.</p>
+
+            <p>Артемий наконец понял важность баланса между умом и общением, став не просто умным человеком, но и мудрым. И хотя о прошлом напоминал лишь его запах, его достижения и влияние продолжали жить в сердцах людей. Научное наследие Артемия стало живым примером того, что даже самые необычные люди могут оставлять незабываемый след в истории, если они открыты для изменений.</p>
+        </div>
+        <aside class="sidebar">
+            <h2>Реклама</h2>
+            <h1><strong>Всего  одна ложка соды этого чудодейственного препарата...<br> Читать далее...</strong></h1>
+            <img src="soda.love'.jpg" alt="Читать далее...">
+            <p>спонсор программы Яблонька</p>
+            <h1><strong>Вступай в ряды ЧВК Яблонька</strong></h1>
+            <p><b>Мы ждем тебя!</b></p>
+            <img src="logo.jpg" alt="Читать далее..."><p>Первые выплаты от 200тыс.р</p>
+            <img src="chill_guy.gif" width="400" height="400" alt="Просто чилловый Артем">
+        </aside>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <h2>Пожертвования на проезд автору</h2>
+            <p>30% от пожертвования уходит Артемию на обед</p>
+            <form action="donate.php" method="POST">
+                <label for="amount">Сумма пожертвования:</label><br>
+                <input type="number" id="amount" name="amount" required>
+                <br><br>
+                <label for="method">Способ пожертвования:</label><br>
+                <select id="method" name="method">
+                    <option value="СБП">СБП</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="МИР">МИР</option>
+                    <option value="microЗайм">microЗайм</option>
+                </select>
+                <br><br>
+                <button class="donate" type="submit">Пожертвовать</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>по всем вопросам о сотрудничестве пишите в разделе контакты>>Менеджер>>Телеграмм</p>
+        <p>Спонсировано частным лицом - Воеводиным Захаром и организацией "Яблонька"</p>
+        <p>Все права защищены &copy; 2024</p>
+    </footer>
+
+    <button id="toggle-chat">Чат с Артемом</button>
+
+    <div id="chat" class="chat-container">
+        <div class="chat-header">Чат с Артемом</div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Введите ваше сообщение...">
+            <button id="send-button">Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('toggle-chat').onclick = function () {
+            const chat = document.getElementById('chat');
+            chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        document.getElementById('send-button').onclick = function () {
+            sendMessage();
+        };
+
+        document.getElementById('user-input').addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (userInput.trim() === '') return;
+            addMessage('user', userInput);
+            document.getElementById('user-input').value = '';
+            generateResponse(userInput);
+        }
+
+        function addMessage(sender, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender === 'user' ? 'user-message' : 'bot-message');
+            messageDiv.textContent = text;
+            document.getElementById('chat-messages').appendChild(messageDiv);
+            // Прокрутка вниз
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function generateResponse(input) {
+            const lowerCaseInput = input.toLowerCase();
+            let previousResponse = '';
+
+// Условия для генерации ответов
+if (lowerCaseInput.includes('привет')) {
+    response = 'Привет Рустам! Ты сделал домашку по матеше?';
+} else if (lowerCaseInput.includes('как дела')) {
+    response = 'У меня всё хорошо, завтра пойдешь в столовку?';
+} else if (lowerCaseInput.includes('пока')) {
+    response = 'До свидания! Надеюсь, завтра Ольга Анатольевна спросит теорему Пика';
+} else if (lowerCaseInput.includes('погода')) {
+    response = 'Погода сегодня говно! Думаю не пойти на пары';
+} else if (lowerCaseInput.includes('когда выкинешь футболку')) {
+    response = 'У меня много таких футболок, если что';
+} else if (lowerCaseInput.includes('от тебя воняет')) {
+    response = 'У тебя видимо нюха нет, и я дезиком пользуюсь, тебе бы тоже не помешало';
+} else if (lowerCaseInput.includes('ниуя се вонь от тебя')) {
+    response = 'Тебе кажется, я дезиком пользуюсь';
+} else if (lowerCaseInput.includes('науй иди')) {
+    response = 'Тебе что, ипало набить?';
+} else if (lowerCaseInput.includes('Теорема Пика')) {
+    response = 'Формула Пи́ка — классический результат комбинаторной геометрии и геометрии чисел, даёт выражение для площади многоугольника с целочисленными вершинами. Названа в честь Георга Пика, доказавшего её в 1899 году.';
+} else if (lowerCaseInput.includes('ты где')) {
+    response = 'Я сейчас на стрельбище, т.к. забрали на СВО';
+} else if (lowerCaseInput.includes('тебе к какой паре')) {
+    response = 'никакой я отчислился, потому что пиздат, и этот материал я давно сдал, потому что на ую вертел';
+} else if (lowerCaseInput.includes('ну и вонь от тебя')) {
+    response = 'динаху, норм пахнет не жалуюсь';
+} else if (lowerCaseInput.includes('ты не думал помыться')) {
+    response = 'Лицо себе помой, чучело';
+} else if (lowerCaseInput.includes('Артем помойся')) {
+    response = 'я и так каждый день моюсь';
+} else if (lowerCaseInput.includes('воняет от тебя')) {
+    response = 'я дезиком пользуюсь';
+} else if (lowerCaseInput.includes('кто самый пздатый')) {
+    response = 'Конечно я, кто еще';
+} else if (lowerCaseInput.includes('пошли в яблоньку')) {
+    response = 'Нет, у меня дел дома по горло, т.к. дома два отчима ждут';
+} else if (lowerCaseInput.includes('го в яблоньку')) {
+    response = 'Нет, у меня дел дома по горло, т.к. дома два отчима ждут';
+} else if (lowerCaseInput.includes('почему нет тебя на парах')) {
+    response = 'Я жостко качаюсь, не мешай';
+} else if (lowerCaseInput.includes('когда пойдешь на пары')) {
+    response = 'Я ходил уже в сентябре, науй надо, мне уже автомат поставили';
+} else if (lowerCaseInput.includes('когда на СВО')) {
+    response = 'Уже там, я уже второй месяц не хожу в уник';
+} else if (lowerCaseInput.includes('купи новые джинсы')) {
+    response = 'Норм джинсы, что мешает, я только недавно купил, еще своему сыну отдам';
+} else if (lowerCaseInput.includes('Захар сдаст сессию')) {
+    response = 'Нет, потому что не знает формулу Пика';
+} else if (lowerCaseInput.includes('Захар провалит сессию')) {
+    response = 'Конечно, раздолбай, потому что';
+} else if (lowerCaseInput.includes('какова вероятность что сдаст сессию Захар')) {
+    response = 'Нулевая';
+} else if (lowerCaseInput.includes('мне идти на пару')) {
+    response = 'Конечно, нечего прогуливать';
+} else if (lowerCaseInput.includes('что ты думаешь о Захаре')) {
+    response = 'Четкий мужик, в бане хорошо натаскал';
+} else if (lowerCaseInput.includes('какого ты мнения о Захаре')) {
+    response = 'Хорошем, помню в сауне натаскал его знатно';
+} else if (lowerCaseInput.includes('в чем смысл жизни')) {
+    response = 'в хорошем обеде';
+} else if (lowerCaseInput.includes('до скольки ты сегодня')) {
+    response = 'до 2025, я контракт подписал';
+} else if (lowerCaseInput.includes('го вместе доедем')) {
+    response = 'неее, я сегодня не могу, насрал в штаны на матеше';
+} else if (lowerCaseInput.includes('ты сейчас в унике')) {
+    response = 'да вот крышеваю столовку';
+} else if (lowerCaseInput.includes('сколько тебе стипендия пришла')) {
+    response = 'я ее не вижу, сразу в дрочильне все спускаю';
+} else if (lowerCaseInput.includes('куда ты тратишь стипендию')) {
+    response = 'в ддрочильне все спустил';
+} else if (lowerCaseInput.includes('зачем ты поступил в сгту')) {
+    response = 'потому что в армию не хотел';
+} else if (lowerCaseInput.includes('тебе не надоело кататься')) {
+    response = 'я отчислился давно, почему тогда мы больше не встречаемся при отьезде';
+} else if (lowerCaseInput.includes('сколько тебе учиться')) {
+    response = 'я отчислился сейчас на сво';
+} else if (lowerCaseInput.includes('как у тебя с учебой')) {
+    response = 'да я ее на ую вертел, я отчислился';
+} else if (lowerCaseInput.includes('ты футболку продаешь')) {
+    response = 'к сожалению не продаю, тк у самого вещей впритык (лишних нет) + недавно джинсы порвал';
+} else if (lowerCaseInput.includes('ты джинсы продаешь')) {
+    response = 'к сожалению не продаю, тк у самого вещей впритык (лишних нет) + недавно джинсы порвал';
+} else if (lowerCaseInput.includes('Хорошо')) {
+    response = 'Понятно';
+} else if (lowerCaseInput.includes('ты гений')) {
+    response = 'знаю, я пиздат';
+} else if (lowerCaseInput.includes('вступай в ряды яблоньки')) {
+    response = 'к сожалению не, тк деняг нету, последнюю стипендию слил в дрочильне';
+} else if (lowerCaseInput.includes('го обратно в энгельс')) {
+    response = 'неа, я в Саратове останусь на вокзале чисто с братками спать';
+} else if (lowerCaseInput.includes('го в баню')) {
+    response = 'только если все вместе в качалке, дезик брать не буду';
+} else if (lowerCaseInput.includes('го в сауну')) {
+    response = 'го пупсик';
+} else if (lowerCaseInput.includes('го в дрочильню')) {
+    response = 'только если ты мне';
+} else if (lowerCaseInput.includes('во сколько тебе обходиться проезд')) {
+    response = 'бесплатно';
+} else if (lowerCaseInput.includes('почему так')) {
+    response = 'потому что пздат';
+} else if (lowerCaseInput.includes('что думаешь о Ольге Анатольевне')) {
+    response = 'да та еще тетка, лучше б дома сидел, параметры нарешивал';
+} else if (lowerCaseInput.includes('ты не хочешь отчислиться')) {
+    response = 'уже отчислился, на сво вот';
+} else if (lowerCaseInput.includes('как у тебя с математикой')) {
+    response = 'Довольно хорошо, вот по теореме Пика натянул учиху';
+} else if (lowerCaseInput.includes('как ты относишься к Виталику')) {
+    response = 'аутист ипанный';
+} else if (lowerCaseInput.includes('тебе деньги не переведу')) {
+    response = 'аххх ты епанный театр, жмот';
+} else if (lowerCaseInput.includes('во скок домой')) {
+    response = 'домой не приеду, я на сво сейчас';
+} else if (lowerCaseInput.includes('го в пк клуб')) {
+    response = 'наху иди, я на пары';
+} else if (lowerCaseInput.includes('го в столовую')) {
+    response = 'если плов будет без вопросов';
+} else if (lowerCaseInput.includes('а пары')) {
+    response = 'а пары я ипал в рот';
+} else if (lowerCaseInput.includes('да не ожидал от тебя')) {
+    response = 'ты меня плохо знаешь';
+} else if (lowerCaseInput.includes('куда деньги тратишь')) {
+    response = 'все деньги идут на моих детей';
+} else if (lowerCaseInput.includes('отдай мне футболку')) {
+    response = 'хуле не отдам, это келвин клейн';
+} else if (lowerCaseInput.includes('ты дезодорантом не пробовал пшыкаться')) {
+    response = 'не помогает';
+} else if (lowerCaseInput.includes('мыться')) {
+    response = 'воды нету';
+} else if (lowerCaseInput.includes('проведи')) {
+    response = 'если б мог, давно помылся';
+} else if (lowerCaseInput.includes('ты духами не пробовал пшыкаться')) {
+    response = 'пробовал, не помогает перебить этот зловонный запах';
+} else if (lowerCaseInput.includes('кто ты')) {
+    response = 'я обычный сосед, человек паук';
+} else if (lowerCaseInput.includes('сдай вместо меня сессию')) {
+    response = 'сам давай как нибудь, да';
+} else if (lowerCaseInput.includes('конечно')) {
+    response = 'понятно';
+} else if (lowerCaseInput.includes('теорема пика')) {
+    response = 'Формула Пи́ка — классический результат комбинаторной геометрии и геометрии чисел, даёт выражение для площади многоугольника с целочисленными вершинами. Названа в честь Георга Пика, доказавшего её в 1899 году.';
+} else if (lowerCaseInput.includes('число пи')) {
+    response = 'если я б знал';
+} else if (lowerCaseInput.includes('сколько можно')) {
+    response = 'сколько захочу';
+} else if (lowerCaseInput.includes('помоги с домашкой')) {
+    response = 'пзда, сам делай';
+} else if (lowerCaseInput.includes('как мне сдать зачет')) {
+    response = 'пзда, никак';
+} else if (lowerCaseInput.includes('почему тебя все обходят')) {
+    response = 'потому что я абсолют';
+} else if (lowerCaseInput.includes('сколько тебе лет')) {
+    response = '150';
+} else if (lowerCaseInput.includes('пзда')) {
+    response = 'сам удивлен';
+} else if (lowerCaseInput.includes('откуда у тебя столько детей')) {
+    response = 'либо алименты платить, либо это, выбор очевиден';
+} else if (lowerCaseInput.includes('откуда у тебя дети')) {
+    response = 'либо алименты платить, либо это, выбор очевиден';
+} else if (lowerCaseInput.includes('будет ли ядерка')) {
+    response = 'конечно';
+} else if (lowerCaseInput.includes('рукету орешник ты запустил')) {
+    response = 'конечно';
+} else if (lowerCaseInput.includes('почему ты носишь с собой постоянно наушники')) {
+    response = 'быть все время на коннекте со своими';
+} else if (lowerCaseInput.includes('когда будет ядерка')) {
+    response = 'сегодня';
+} else if (lowerCaseInput.includes('сожги футболку')) {
+    response = 'у меня навалом футболок, конечно';
+} else if (lowerCaseInput.includes('че у тебя сегодня по расписанию')) {
+    response = 'мммммм...ничего';
+} else if (lowerCaseInput.includes('го домой')) {
+    response = 'конечно, сейчас на вокзал поеду';
+} else if (lowerCaseInput.includes('го в энгельс')) {
+    response = 'го, ты где';
+} else if (lowerCaseInput.includes('на вокзале')) {
+    response = 'иди ка науй';
+} else if (lowerCaseInput.includes('го в уник')) {
+    response = 'конечно';
+} else if (lowerCaseInput.includes('во сколько на вокзал')) {
+    response = 'еще на паре';
+} else if (lowerCaseInput.includes('когда на сво')) {
+    response = 'скоро, после зимней';
+} else if (lowerCaseInput.includes('ты куда пропал')) {
+    response = 'на сво забрали';
+} else if (lowerCaseInput.includes('хорошо')) {
+    response = 'прелестно';
+} else if (lowerCaseInput.includes('опять прогулял')) {
+    response = 'и что';
+} else if (lowerCaseInput.includes('а ни че')) {
+    response = 'динаху';
+} else if (lowerCaseInput.includes('скинь деньги')) {
+    response = 'нету у меня и на джинсы деняг нет, без них хожу';
+} else if (lowerCaseInput.includes('пошли в зал')) {
+    response = 'конечно';
+} else if (lowerCaseInput.includes('пошли в качалку')) {
+    response = 'вооо, с голыми мужиками надеюсь';
+} else if (lowerCaseInput.includes('тебе скинули стипендию')) {
+    response = 'нет, я отчислился и на сво пошел';
+} else if (lowerCaseInput.includes('ты получил стипендию')) {
+    response = 'нет, я уже в дрочильне потратил все';
+} else if (lowerCaseInput.includes('ты бот')) {
+    response = 'нет'
+}
+            else {
+              response = 'блять';
+            }
+            addMessage('bot', response);
+        }
+    </script>
+</body>
+
+</html>
